@@ -1,1 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iTabs Demo - Enhanced Product Information</title>
+    <style>
+        /* Clean, modern styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .product-container {
+            margin-bottom: 40px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .product-content {
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #3498db;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        
+        p {
+            margin-bottom: 16px;
+        }
+        
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        
+        /* iTabs styling */
+        .itab-trigger {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .itab-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            border-bottom: 1px dotted #3498db;
+        }
+        
+        .itab-link:hover {
+            color: #2980b9;
+        }
+        
+        .itab-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 10px;
+            margin-left: 4px;
+            position: relative;
+            top: -6px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .itab-popup {
+            position: fixed;
+            z-index: 100;
+            width: 360px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-out;
+            display: none;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        
+        .itab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .itab-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .itab-close {
+            cursor: pointer;
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        
+        .itab-tabs {
+            display: flex;
+            background-color: #f1f2f3;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .itab-tab {
+            padding: 10px 15px;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .itab-tab.active {
+            background-color: white;
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .itab-content {
+            display: none;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .itab-content.active {
+            display: block;
+        }
+        
+        .itab-footer {
+            display: flex;
+            justify-content: center;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .itab-button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .itab-button:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Tables for specs */
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        .specs-table tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        .specs-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        .specs-table td:first-child {
+            font-weight: 500;
+            width: 40%;
+        }
+        
+        /* Feature list */
+        .features-list {
+            padding-left: 25px;
+            margin: 0;
+        }
+        
+        .features-list li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        /* Product images */
+        .product-image {
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            display: block;
+            margin: 0 auto 15px;
+            border-radius: 4px;
+        }
+        
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            display: none;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .itab-popup {
+                width: 90%;
+                max-width: 100%;
+            }
+            
+            .itab-tab {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-title">
+            <h1>iTabs: Enhanced Product Information</h1>
+            <p>This demo shows how iTabs enhances affiliate links with rich, contextual information. Click on the blue information icons (i) to see detailed product information without leaving the page.</p>
+        </div>
+        
+        <div class="product-container">
+            <div class="product-content">
+                <h2>Demo: Product Review Article</h2>
+                
+                <!-- Static example for Part 1 - will be replaced with dynamic content in Part 2 -->
+                <div id="productList">
+                    <p>Check out these top products I've been testing lately:</p>
+                    
+                    <p>
+                        The <span class="itab-link">XTech Pro 5G Smartphone</span>
+                        <span class="itab-icon">i</span>
+                        is a fantastic device with impressive performance.
+                    </p>
+                    
+                    <p>
+                        The <span class="itab-link">UltraSound Wireless Earbuds</span>
+                        <span class="itab-icon">i</span>
+                        are one of the best tech products I've used this year.
+                    </p>
+                    
+                    <p>
+                        The <span class="itab-link">PowerBook Ultra Laptop</span>
+                        <span class="itab-icon">i</span>
+                        is surprisingly powerful for its compact size.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overlay for popups -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Static popup example for Part 1 -->
+    <div class="itab-popup" id="example-popup">
+        <div class="itab-header">
+            <div class="itab-title">XTech Pro 5G Smartphone</div>
+            <div class="itab-close">&times;</div>
+        </div>
+        <div class="itab-tabs">
+            <div class="itab-tab active">Info</div>
+            <div class="itab-tab">Features</div>
+            <div class="itab-tab">Specs</div>
+        </div>
+        <div class="itab-content active">
+            <p>The XTech Pro 5G offers flagship performance at a competitive price. Featuring a stunning 6.5-inch AMOLED display, Snapdragon 888 processor, and a versatile triple camera system, this device delivers exceptional value without compromising on features.</p>
+            <img class="product-image" src="https://via.placeholder.com/400x400.png?text=XTech+Pro+5G" alt="XTech Pro 5G">
+        </div>
+        <div class="itab-footer">
+            <a href="#" class="itab-button">View Product</a>
+        </div>
+    </div>
 
+    <!-- Note: JavaScript functionality will be added in Part 2 -->
+    <script>
+        // This is just a placeholder for Part 1
+        // Part 2 will include the full interactive functionality
+        
+        // For demonstration purpose only - to show how the popup would look
+        document.addEventListener('DOMContentLoaded', function() {
+            // This would show the example popup
+            // Uncomment to see it when the page loads
+            // document.getElementById('example-popup').style.display = 'block';
+            // document.getElementById('overlay').style.display = 'block';
+        });
+    </script>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iTabs Demo - Enhanced Product Information</title>
+    <style>
+        /* Clean, modern styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .product-container {
+            margin-bottom: 40px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .product-content {
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #3498db;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        
+        p {
+            margin-bottom: 16px;
+        }
+        
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        
+        /* iTabs styling */
+        .itab-trigger {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .itab-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            border-bottom: 1px dotted #3498db;
+        }
+        
+        .itab-link:hover {
+            color: #2980b9;
+        }
+        
+        .itab-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 10px;
+            margin-left: 4px;
+            position: relative;
+            top: -6px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .itab-popup {
+            position: fixed;
+            z-index: 100;
+            width: 360px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-out;
+            display: none;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        
+        .itab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .itab-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .itab-close {
+            cursor: pointer;
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        
+        .itab-tabs {
+            display: flex;
+            background-color: #f1f2f3;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .itab-tab {
+            padding: 10px 15px;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .itab-tab.active {
+            background-color: white;
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .itab-content {
+            display: none;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .itab-content.active {
+            display: block;
+        }
+        
+        .itab-footer {
+            display: flex;
+            justify-content: center;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .itab-button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .itab-button:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Tables for specs */
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        .specs-table tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        .specs-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        .specs-table td:first-child {
+            font-weight: 500;
+            width: 40%;
+        }
+        
+        /* Feature list */
+        .features-list {
+            padding-left: 25px;
+            margin: 0;
+        }
+        
+        .features-list li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        /* Product images */
+        .product-image {
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            display: block;
+            margin: 0 auto 15px;
+            border-radius: 4px;
+        }
+        
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            display: none;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .itab-popup {
+                width: 90%;
+                max-width: 100%;
+            }
+            
+            .itab-tab {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-title">
+            <h1>iTabs: Enhanced Product Information</h1>
+            <p>This demo shows how iTabs enhances affiliate links with rich, contextual information. Click on the blue information icons (i) to see detailed product information without leaving the page.</p>
+        </div>
+        
+        <div class="product-container">
+            <div class="product-content">
+                <h2>Demo: Product Review Article</h2>
+                
+                <div id="productList" class="loading">
+                    Loading products...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overlay for popups -->
+    <div class="overlay" id="overlay" onclick="closeAllPopups()"></div>
+    
+    <!-- Product Popup Template (will be cloned for each product) -->
+    <template id="popupTemplate">
+        <div class="itab-popup" id="product-popup-ID">
+            <div class="itab-header">
+                <div class="itab-title">Product Title</div>
+                <div class="itab-close" onclick="closePopup('ID')">&times;</div>
+            </div>
+            <div class="itab-tabs">
+                <div class="itab-tab active" onclick="switchTab('ID', 'info')">Info</div>
+                <div class="itab-tab" onclick="switchTab('ID', 'features')">Features</div>
+                <div class="itab-tab" onclick="switchTab('ID', 'specs')">Specs</div>
+            </div>
+            <div id="product-ID-info" class="itab-content active">
+                <p class="product-description">Product description loads here...</p>
+                <img class="product-image" src="" alt="Product Image">
+            </div>
+            <div id="product-ID-features" class="itab-content">
+                <ul class="features-list">
+                    <!-- Features will load here -->
+                </ul>
+            </div>
+            <div id="product-ID-specs" class="itab-content">
+                <table class="specs-table">
+                    <!-- Specs will load here -->
+                </table>
+            </div>
+            <div class="itab-footer">
+                <a href="#" class="itab-button product-link">View Product</a>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // Product data - embedded directly in the HTML for simplicity
+        // In a real implementation, this would be loaded from an external JSON file or API
+        const products = [
+          {
+            "id": 1,
+            "title": "XTech Pro 5G Smartphone",
+            "price": 699.99,
+            "description": "The XTech Pro 5G offers flagship performance at a competitive price. Featuring a stunning 6.5-inch AMOLED display, Snapdragon 888 processor, and a versatile triple camera system, this device delivers exceptional value without compromising on features.",
+            "category": "electronics",
+            "image": "https://via.placeholder.com/400x400.png?text=XTech+Pro+5G",
+            "rating": {
+              "rate": 4.6,
+              "count": 384
+            },
+            "tabContent": {
+              "features": [
+                "Advanced AI photography system with night mode",
+                "IP68 water and dust resistance",
+                "Gorilla Glass Victus protection",
+                "Stereo speakers with Dolby Atmos",
+                "Under-display fingerprint scanner",
+                "Wireless charging and reverse wireless charging"
+              ],
+              "specifications": {
+                "display": "6.5-inch AMOLED, 120Hz, HDR10+",
+                "processor": "Snapdragon 888, Octa-core",
+                "ram": "8GB LPDDR5",
+                "storage": "128GB/256GB UFS 3.1",
+                "battery": "4500mAh, 65W fast charging",
+                "camera": "50MP main, 12MP ultrawide, 8MP telephoto"
+              }
+            },
+            "productUrl": "https://example.com/products/xtech-pro-5g"
+          },
+          {
+            "id": 2,
+            "title": "UltraSound Wireless Earbuds",
+            "price": 149.99,
+            "description": "Experience premium audio with the UltraSound Wireless Earbuds. These earbuds deliver exceptional sound quality, effective noise cancellation, and all-day battery life in a comfortable, lightweight design that's perfect for any activity.",
+            "category": "electronics",
+            "image": "https://via.placeholder.com/400x400.png?text=UltraSound+Earbuds",
+            "rating": {
+              "rate": 4.4,
+              "count": 256
+            },
+            "tabContent": {
+              "features": [
+                "Advanced Active Noise Cancellation",
+                "Transparency mode for ambient sound",
+                "Touch controls for playback and calls",
+                "Voice assistant compatibility",
+                "Automatic ear detection",
+                "Companion app with EQ settings"
+              ],
+              "specifications": {
+                "driver": "11mm dynamic drivers",
+                "connectivity": "Bluetooth 5.2",
+                "battery": "8 hours (buds), 24 hours (with case)",
+                "charging": "USB-C and Qi wireless",
+                "noise_cancellation": "Active Noise Cancellation (ANC)",
+                "water_resistance": "IPX5"
+              }
+            },
+            "productUrl": "https://example.com/products/ultrasound-earbuds"
+          },
+          {
+            "id": 3,
+            "title": "PowerBook Ultra Laptop",
+            "price": 1799.99,
+            "description": "The PowerBook Ultra delivers desktop-class performance in a relatively slim package. With a stunning 15.6-inch display, powerful processor options, and dedicated graphics, this laptop is a powerhouse for creators and gamers who need maximum performance on the go.",
+            "category": "electronics",
+            "image": "https://via.placeholder.com/400x400.png?text=PowerBook+Ultra",
+            "rating": {
+              "rate": 4.7,
+              "count": 189
+            },
+            "tabContent": {
+              "features": [
+                "Advanced cooling system with liquid metal thermal solution",
+                "RGB per-key customizable keyboard",
+                "Thunderbolt 4, USB-A, HDMI 2.1, SD card reader",
+                "Wi-Fi 6E and Bluetooth 5.2",
+                "CNC aluminum unibody design",
+                "Dolby Atmos quad speakers"
+              ],
+              "specifications": {
+                "processor": "Intel Core i7-12700H / AMD Ryzen 9 6900HX",
+                "display": "15.6-inch 2.5K IPS, 165Hz, 100% sRGB",
+                "graphics": "NVIDIA RTX 3070 Ti (8GB GDDR6)",
+                "ram": "16GB/32GB DDR5",
+                "storage": "1TB/2TB PCIe Gen4 NVMe SSD",
+                "battery": "90Wh, up to 8 hours of use"
+              }
+            },
+            "productUrl": "https://example.com/products/powerbook-ultra"
+          }
+        ];
+        
+        // Display the products in the page
+        function displayProducts() {
+            const productList = document.getElementById('productList');
+            productList.className = ''; // Remove loading class
+            
+            let html = '<p>Check out these top products I\'ve been testing lately:</p>';
+            
+            products.forEach((product, index) => {
+                // Create a product mention with iTabs icon
+                html += `<p>
+                    The <span class="itab-link">${product.title}</span>
+                    <span class="itab-icon" onclick="showPopup(${index})"">i</span>
+                    is ${getRandomProductDescription(product.category)}.
+                </p>`;
+                
+                // Create popup for this product
+                createProductPopup(product, index);
+            });
+            
+            productList.innerHTML = html;
+        }
+        
+        // Create popup element for a product
+        function createProductPopup(product, index) {
+            // Clone template
+            const template = document.getElementById('popupTemplate');
+            const popup = template.content.cloneNode(true);
+            
+            // Update IDs and content
+            const popupElement = popup.querySelector('.itab-popup');
+            popupElement.id = `product-popup-${index}`;
+            
+            // Set title
+            popup.querySelector('.itab-title').textContent = product.title;
+            
+            // Update close button
+            popup.querySelector('.itab-close').setAttribute('onclick', `closePopup(${index})`);
+            
+            // Update tab clicks
+            const tabs = popup.querySelectorAll('.itab-tab');
+            tabs.forEach(tab => {
+                const tabName = tab.textContent.toLowerCase();
+                tab.setAttribute('onclick', `switchTab(${index}, '${tabName}')`);
+            });
+            
+            // Update content IDs
+            const contents = popup.querySelectorAll('.itab-content');
+            contents.forEach(content => {
+                const id = content.id.replace('ID', index);
+                content.id = id;
+            });
+            
+            // Fill in content
+            popup.querySelector('.product-description').textContent = product.description;
+            popup.querySelector('.product-image').src = product.image;
+            popup.querySelector('.product-image').alt = product.title;
+            
+            // Fill in features list
+            const featuresList = popup.querySelector('.features-list');
+            featuresList.innerHTML = '';
+            product.tabContent.features.forEach(feature => {
+                const li = document.createElement('li');
+                li.textContent = feature;
+                featuresList.appendChild(li);
+            });
+            
+            // Fill in specs table
+            const specsTable = popup.querySelector('.specs-table');
+            specsTable.innerHTML = '';
+            for (const [key, value] of Object.entries(product.tabContent.specifications)) {
+                const row = document.createElement('tr');
+                
+                const keyCell = document.createElement('td');
+                keyCell.textContent = key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ');
+                
+                const valueCell = document.createElement('td');
+                valueCell.textContent = value;
+                
+                row.appendChild(keyCell);
+                row.appendChild(valueCell);
+                specsTable.appendChild(row);
+            }
+            
+            // Add price and rating to specs
+            const priceRow = document.createElement('tr');
+            const priceKeyCell = document.createElement('td');
+            priceKeyCell.textContent = 'Price';
+            const priceValueCell = document.createElement('td');
+            priceValueCell.textContent = `$${product.price.toFixed(2)}`;
+            priceRow.appendChild(priceKeyCell);
+            priceRow.appendChild(priceValueCell);
+            specsTable.appendChild(priceRow);
+            
+            const ratingRow = document.createElement('tr');
+            const ratingKeyCell = document.createElement('td');
+            ratingKeyCell.textContent = 'Rating';
+            const ratingValueCell = document.createElement('td');
+            ratingValueCell.textContent = `${product.rating.rate}/5 (${product.rating.count} reviews)`;
+            ratingRow.appendChild(ratingKeyCell);
+            ratingRow.appendChild(ratingValueCell);
+            specsTable.appendChild(ratingRow);
+            
+            // Set product link
+            popup.querySelector('.product-link').href = product.productUrl;
+            
+            // Append the popup to the body
+            document.body.appendChild(popup);
+        }
+        
+        // Helper function to get random product description
+        function getRandomProductDescription(category) {
+            const descriptions = {
+                "electronics": [
+                    "a fantastic device with impressive performance",
+                    "one of the best tech products I've used this year",
+                    "surprisingly powerful for its compact size"
+                ]
+            };
+            
+            const categoryDescriptions = descriptions[category] || descriptions["electronics"];
+            return categoryDescriptions[Math.floor(Math.random() * categoryDescriptions.length)];
+        }
+        
+        // Popup control functions
+        function showPopup(productId) {
+            // Show overlay
+            document.getElementById('overlay').style.display = 'block';
+            
+            // Show popup
+            document.getElementById(`product-popup-${productId}`).style.display = 'block';
+        }
+        
+        function closePopup(productId) {
+            // Hide popup
+            document.getElementById(`product-popup-${productId}`).style.display = 'none';
+            
+            // Hide overlay
+            document.getElementById('overlay').style.display = 'none';
+        }
+        
+        function closeAllPopups() {
+            // Hide all popups
+            var popups = document.querySelectorAll('.itab-popup');
+            for (var i = 0; i < popups.length; i++) {
+                popups[i].style.display = 'none';
+            }
+            
+            // Hide overlay
+            document.getElementById('overlay').style.display = 'none';
+        }
+        
+        function switchTab(productId, tabName) {
+            // Remove active class from all tabs and content
+            var popup = document.getElementById(`product-popup-${productId}`);
+            var tabs = popup.querySelectorAll('.itab-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            var contents = popup.querySelectorAll('.itab-content');
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('active');
+            }
+            
+            // Find the tab that was clicked and activate it
+            for (var i = 0; i < tabs.length; i++) {
+                if (tabs[i].textContent.toLowerCase() === tabName) {
+                    tabs[i].classList.add('active');
+                    break;
+                }
+            }
+            
+            // Activate corresponding content
+            document.getElementById(`product-${productId}-${tabName}`).classList.add('active');
+        }
+        
+        // Load products when the page loads
+        document.addEventListener('DOMContentLoaded', displayProducts);
+    </script>
+</body>
+</html>
+</body>
+</html>
