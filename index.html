@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iTabs Demo - Affiliate Product Preview</title>
+    <style>
+        /* Clean, modern styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .product-container {
+            margin-bottom: 40px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .product-content {
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #3498db;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        
+        p {
+            margin-bottom: 16px;
+        }
+        
+        /* iTabs styling */
+        .itab-trigger {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .itab-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            border-bottom: 1px dotted #3498db;
+        }
+        
+        .itab-link:hover {
+            color: #2980b9;
+        }
+        
+        .itab-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 10px;
+            margin-left: 4px;
+            position: relative;
+            top: -6px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .itab-popup {
+            position: fixed;
+            z-index: 100;
+            width: 360px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-out;
+            display: none;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        
+        .itab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .itab-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .itab-close {
+            cursor: pointer;
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        
+        .itab-tabs {
+            display: flex;
+            background-color: #f1f2f3;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .itab-tab {
+            padding: 10px 15px;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .itab-tab.active {
+            background-color: white;
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .itab-content {
+            display: none;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .itab-content.active {
+            display: block;
+        }
+        
+        .itab-footer {
+            display: flex;
+            justify-content: center;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .itab-button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .itab-button:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Tables for specs */
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        .specs-table tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+        
+        .specs-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        .specs-table td:first-child {
+            font-weight: 500;
+            width: 40%;
+        }
+        
+        /* Feature list */
+        .features-list {
+            padding-left: 25px;
+            margin: 0;
+        }
+        
+        .features-list li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        /* Pricing options */
+        .pricing-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .pricing-option:hover {
+            border-color: #3498db;
+            background-color: #f8f9fa;
+        }
+        
+        .store-logo {
+            width: 80px;
+            margin-right: 15px;
+        }
+        
+        .store-price {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-right: auto;
+        }
+        
+        .store-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            display: none;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .itab-popup {
+                width: 90%;
+                max-width: 100%;
+            }
+            
+            .itab-tab {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-title">
+            <h1>iTabs: Enhanced Product Information</h1>
+            <p>Click on the blue information icons (i) to see how iTabs can enhance affiliate links with rich, contextual information.</p>
+        </div>
+        
+        <div class="product-container">
+            <div class="product-content">
+                <h2>Demo: Product Review Article</h2>
+                <p>If you're looking for a high-quality smartphone that doesn't break the bank, the 
+                    <span class="itab-link">XTech Pro 5G</span>
+                    <span class="itab-icon" onclick="showPopup('product1')">i</span>
+                    is definitely worth considering.
+                </p>
+                
+                <p>I've been testing it for a few weeks now, and the battery life is excellent - easily lasting a full day of heavy use. If you're also looking for great accessories, check out the 
+                    <span class="itab-link">UltraSound Wireless Earbuds</span>
+                    <span class="itab-icon" onclick="showPopup('product2')">i</span>
+                    which pair perfectly with the XTech Pro.
+                </p>
+                
+                <p>For productivity, I've been using the 
+                    <span class="itab-link">PowerBook Ultra Laptop</span>
+                    <span class="itab-icon" onclick="showPopup('product3')">i</span>
+                    and it's been fantastic for both work and gaming.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overlay for popups -->
+    <div class="overlay" id="overlay" onclick="closeAllPopups()"></div>
+    
+    <!-- Product 1 Popup -->
+    <div class="itab-popup" id="product1-popup">
+        <div class="itab-header">
+            <div class="itab-title">XTech Pro 5G Smartphone</div>
+            <div class="itab-close" onclick="closePopup('product1')">&times;</div>
+        </div>
+        <div class="itab-tabs">
+            <div class="itab-tab active" onclick="switchTab('product1', 'specs')">Specs</div>
+            <div class="itab-tab" onclick="switchTab('product1', 'features')">Features</div>
+            <div class="itab-tab" onclick="switchTab('product1', 'pricing')">Pricing</div>
+            <div class="itab-tab" onclick="switchTab('product1', 'reviews')">Reviews</div>
+        </div>
+        <div id="product1-specs" class="itab-content active">
+            <table class="specs-table">
+                <tr>
+                    <td>Display</td>
+                    <td>6.5" AMOLED, 120Hz, HDR10+</td>
+                </tr>
+                <tr>
+                    <td>Processor</td>
+                    <td>Snapdragon 888, Octa-core</td>
+                </tr>
+                <tr>
+                    <td>RAM</td>
+                    <td>8GB LPDDR5</td>
+                </tr>
+                <tr>
+                    <td>Storage</td>
+                    <td>128GB/256GB UFS 3.1</td>
+                </tr>
+                <tr>
+                    <td>Battery</td>
+                    <td>4500mAh, 65W fast charging</td>
+                </tr>
+                <tr>
+                    <td>Camera</td>
+                    <td>50MP main, 12MP ultrawide, 8MP telephoto</td>
+                </tr>
+            </table>
+        </div>
+        <div id="product1-features" class="itab-content">
+            <ul class="features-list">
+                <li>Advanced AI photography system with night mode</li>
+                <li>IP68 water and dust resistance</li>
+                <li>Gorilla Glass Victus protection</li>
+                <li>Stereo speakers with Dolby Atmos</li>
+                <li>Under-display fingerprint scanner</li>
+                <li>Wireless charging and reverse wireless charging</li>
+            </ul>
+        </div>
+        <div id="product1-pricing" class="itab-content">
+            <div class="pricing-option">
+                <img src="https://via.placeholder.com/80x30.png?text=Amazon" alt="Amazon" class="store-logo">
+                <div class="store-price">$699.99</div>
+                <button class="store-button">View Deal</button>
+            </div>
+            <div class="pricing-option">
+                <img src="https://via.placeholder.com/80x30.png?text=BestBuy" alt="Best Buy" class="store-logo">
+                <div class="store-price">$719.99</div>
+                <button class="store-button">View Deal</button>
+            </div>
+            <div class="pricing-option">
+                <img src="https://via.placeholder.com/80x30.png?text=Walmart" alt="Walmart" class="store-logo">
+                <div class="store-price">$689.99</div>
+                <button class="store-button">View Deal</button>
+            </div>
+        </div>
+        <div id="product1-reviews" class="itab-content">
+            <p><strong>Rating:</strong> 4.6/5 stars (384 reviews)</p>
+            <p><strong>Pros:</strong> Excellent display, powerful processor, great camera system, all-day battery life, fast charging.</p>
+            <p><strong>Cons:</strong> No headphone jack, no expandable storage, average low-light camera performance.</p>
+            <p>"The XTech Pro 5G offers flagship performance at a competitive price. It excels in nearly every category with only minor compromises."</p>
+        </div>
+        <div class="itab-footer">
+            <a href="#" class="itab-button">See Full Review</a>
+        </div>
+    </div>
+    
+    <!-- Product 2 Popup -->
+    <div class="itab-popup" id="product2-popup">
+        <div class="itab-header">
+            <div class="itab-title">UltraSound Wireless Earbuds</div>
+            <div class="itab-close" onclick="closePopup('product2')">&times;</div>
+        </div>
+        <div class="itab-tabs">
+            <div class="itab-tab active" onclick="switchTab('product2', 'specs')">Specs</div>
+            <div class="itab-tab" onclick="switchTab('product2', 'features')">Features</div>
+            <div class="itab-tab" onclick="switchTab('product2', 'pricing')">Pricing</div>
+            <div class="itab-tab" onclick="switchTab('product2', 'reviews')">Reviews</div>
+        </div>
+        <div id="product2-specs" class="itab-content active">
+            <table class="specs-table">
+                <tr>
+                    <td>Driver Size</td>
+                    <td>11mm dynamic drivers</td>
+                </tr>
+                <tr>
+                    <td>Connectivity</td>
+                    <td>Bluetooth 5.2</td>
+                </tr>
+                <tr>
+                    <td>Battery Life</td>
+                    <td>8 hours (buds), 24 hours (with case)</td>
+                </tr>
+                <tr>
+                    <td>Charging</td>
+                    <td>USB-C and Qi wireless</td>
+                </tr>
+                <tr>
+                    <td>Noise Cancellation</td>
+                    <td>Active Noise Cancellation (ANC)</td>
+                </tr>
+                <tr>
+                    <td>Water Resistance</td>
+                    <td>IPX5</td>
+                </tr>
+            </table>
+        </div>
+        <div id="product2-features" class="itab-content">
+            <ul class="features-list">
+                <li>Advanced Active Noise Cancellation</li>
+                <li>Transparency mode for ambient sound</li>
+                <li>Touch controls for playback and calls</li>
+                <li>Voice assistant compatibility</li>
+                <li>Automatic ear detection</li>
+                <li>Companion app with EQ settings</li>
+            </ul>
+        </div>
+        <div id="product2-pricing" class="itab-content">
+            <div class="pricing-option">
+                <img src="https://via.placeholder.com/80x30.png?text=Amazon" alt="Amazon" class="store-logo">
+                <div class="store-price">$149.99</div>
+                <button class="store-button">View Deal</button>
+            </div>
+            <div class="pricing-option">
+                <img src="https://via.placeholder.com/80x30.png?text=BestBuy" alt="Best Buy" class="store-logo">
+                <div class="store-price">$159.99</div>
+                <button class="store-button">View Deal</button>
+            </div>
+            <div class="pricing-option">
+                <img src="https://via.placeholder.com/80x30.png?text=Target" alt="Target" class="store-logo">
+                <div class="store-price">$154.99</div>
+                <button class="store-button">View Deal</button>
+            </div>
+        </div>
+        <div id="product2-reviews" class="itab-content">
+            <p><strong>Rating:</strong> 4.4/5 stars (256 reviews)</p>
+            <p><strong>Pros:</strong> Excellent sound quality, effective noise cancellation, comfortable fit, great battery life.</p>
+            <p><strong>Cons:</strong> Case is a bit bulky, occasional connection issues, average call quality in noisy environments.</p>
+            <p>"The UltraSound earbuds deliver impressive audio quality and noise cancellation at a competitive price point. They're among the best mid-range wireless earbuds available today."</p>
+        </div>
+        <div class="itab-footer">
+            <a href="#" class="itab-button">See Full Review</a>
+        </div>
+    </div>
+    
+    <!-- Product 3 Popup -->
+    <div class="itab-popup" id="product3-popup">
+        <div class="itab-header">
+            <div class="itab-title">PowerBook Ultra Laptop</div>
+            <div class="itab-close" onclick="closePopup('product3')">&times;</div>
+        </div>
+        <div class="itab-tabs">
+            <div class="itab-tab active" onclick="switchTab('product3', 'specs')">Specs</div>
+            <div class="itab-tab" onclick="switchTab('product3', 'features')">Features</div>
+            <div class="itab-tab" onclick="switchTab('product3', 'pricing')">Pricing</div>
+            <div class="itab-tab" onclick="switchTab('product3', 'reviews')">Reviews</div>
+        </div>
+        <div id="product3-specs" class="itab-content active">
+            <table class="specs-table">
+                <tr>
+                    <td>Processor</td>
+                    <td>Intel Core i7-12700H / AMD Ryzen 9 6900HX</td>
+                </tr>
+                <tr>
+                    <td>Display</td>
+                    <td>15.6" 2.5K IPS, 165Hz, 100% sRGB</td>
+                </tr>
+                <tr>
+                    <td>Graphics</td>
+                    <td>NVIDIA RTX 3070 Ti (8GB GDDR6)</td>
+                </tr>
+                <tr>
+                    <td>RAM</td>
+                    <td>16GB/32GB DDR5</td>
+                </tr>
+                <tr>
+                    <td>Storage</td>
+                    <td>1TB/2TB PCIe Gen4 NVMe SSD</td>
+                </tr>
+                <tr>
+                    <td>Battery</td>
+                    <td>90Wh, up to 8 hours of use</td>
+                </tr>
+            </table>
+        </div>
+        <div id="product3-features" class="itab-content">
+            <ul class="features-list">
+                <li>Advanced cooling system with liquid metal thermal solution</li>
+                <li>RGB per-key customizable keyboard</li>
+                <li>Thunderbolt 4, USB-A, HDMI 2.1, SD card reader</li>
+                <li>Wi-Fi 6E and Bluetooth 5.2</li>
+                <li>CNC aluminum unibody design</li>
+                <li>Dolby Atmos quad speakers</li>
+            </ul>
+        </div>
+        <div id="product3-pricing" class="itab-content">
+            <div class="pricing-option">
+                <img src="https://via.placeholder.com/80x30.png?text=Amazon" alt="Amazon" class="store-logo">
+                <div class="store-price">$1,799.99</div>
+                <button class="store-button">View Deal</button>
+            </div>
+            <div class="pricing-option">
+                <img src="https://via.placeholder.com/80x30.png?text=BestBuy" alt="Best Buy" class="store-logo">
+                <div class="store-price">$1,849.99</div>
+                <button class="store-button">View Deal</button>
+            </div>
+            <div class="pricing-option">
+                <img src="https://via.placeholder.com/80x30.png?text=Newegg" alt="Newegg" class="store-logo">
+                <div class="store-price">$1,779.99</div>
+                <button class="store-button">View Deal</button>
+            </div>
+        </div>
+        <div id="product3-reviews" class="itab-content">
+            <p><strong>Rating:</strong> 4.7/5 stars (189 reviews)</p>
+            <p><strong>Pros:</strong> Exceptional performance, beautiful display, excellent build quality, great keyboard, comprehensive port selection.</p>
+            <p><strong>Cons:</strong> Fan noise under heavy load, average battery life, premium price point.</p>
+            <p>"The PowerBook Ultra delivers desktop-class performance in a relatively slim package. It's a powerhouse for creators and gamers who need maximum performance on the go."</p>
+        </div>
+        <div class="itab-footer">
+            <a href="#" class="itab-button">See Full Review</a>
+        </div>
+    </div>
+
+    <script>
+        // Simplified JavaScript with direct function calls
+        function showPopup(productId) {
+            // Show overlay
+            document.getElementById('overlay').style.display = 'block';
+            
+            // Show popup
+            document.getElementById(productId + '-popup').style.display = 'block';
+        }
+        
+        function closePopup(productId) {
+            // Hide popup
+            document.getElementById(productId + '-popup').style.display = 'none';
+            
+            // Hide overlay
+            document.getElementById('overlay').style.display = 'none';
+        }
+        
+        function closeAllPopups() {
+            // Hide all popups
+            var popups = document.querySelectorAll('.itab-popup');
+            for (var i = 0; i < popups.length; i++) {
+                popups[i].style.display = 'none';
+            }
+            
+            // Hide overlay
+            document.getElementById('overlay').style.display = 'none';
+        }
+        
+        function switchTab(productId, tabName) {
+            // Remove active class from all tabs and content
+            var tabs = document.querySelectorAll('#' + productId + '-popup .itab-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            var contents = document.querySelectorAll('#' + productId + '-popup .itab-content');
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('active');
+            }
+            
+            // Find the tab that was clicked and activate it
+            var clickedTab = null;
+            for (var i = 0; i < tabs.length; i++) {
+                if (tabs[i].textContent.toLowerCase() === tabName) {
+                    clickedTab = tabs[i];
+                    break;
+                }
+            }
+            
+            if (clickedTab) {
+                clickedTab.classList.add('active');
+            }
+            
+            // Activate corresponding content
+            document.getElementById(productId + '-' + tabName).classList.add('active');
+        }
+    </script>
+</body>
+</html>
